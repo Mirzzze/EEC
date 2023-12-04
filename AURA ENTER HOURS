@@ -1,0 +1,107 @@
+<!--
+ - Created by mpaquin on 8/18/17.
+ -->
+
+<aura:component controller="LCNV_MassEnterHoursController" implements="forceCommunity:availableForAllPageTypes,force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+
+    <!-- Attributes -->
+    <aura:attribute name="test" type="String" default="" access="global"/>
+    <aura:attribute name="Greeting" type="String" default="" access="global"/>
+    <aura:attribute name="studentList" type="Contact[]" default="[]" access="global"/>
+    <aura:attribute name="nameField" type="String" default="Name" access="global"/>
+    <aura:attribute name="startDateField" type="String" default="Start Date" access="global"/>
+    <aura:attribute name="endDateField" type="String" default="End Date" access="global"/>
+    <aura:attribute name="statusField" type="String" default="Status" access="global"/>
+    <aura:attribute name="dropField" type="String" default=" Drop Reason" access="global"/>
+    <aura:attribute name="hourTypeOptions" type="List" default="[{'value':'','label':'Please Select a Type'}]"/>
+    <aura:attribute name="startDate" type="Date" default=""/>
+    <aura:attribute name="endDate" type="Date" default=""/>
+    <aura:attribute name="courseHourList" type="Course_Hours__c[]" default="[]"/>
+    <aura:attribute name="studentSelectedError" type="String" default="false"/>
+
+    <!-- Event handlers -->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler name="change" value="{!v.startDate}" action="{!c.startDateChange}"/>
+    <aura:handler name="change" value="{!v.endDate}" action="{!c.endDateChange}"/>
+
+    <!-- Component Body -->
+    <lightning:card title="">
+        <div aura:id="fieldDiv" class="slds-wrap slds-grid_pull-padded slds-grid slds-align_absolute-center" style="width: 75%">
+            <div class="slds-col slds-col--padded slds-size_1-of-2 slds-p-around_large">
+                <lightning:select aura:id="hourTypeField" label="Hours Type" name="Hours Type" required="true" messageWhenValueMissing="This field is required">
+                    <aura:iteration items="{!v.hourTypeOptions}" var="option">
+                        <option value="{!option.value}" text="{!option.label}"/>
+                    </aura:iteration>
+                </lightning:select>
+                <ui:inputNumber aura:id="hoursField" label="Number of Hours" format=".00" required="true"/>
+            </div>
+            <div class="slds-col slds-col--padded slds-size_1-of-2 slds-p-around_large">
+                <ui:inputDate aura:id="startDateField" label="Hours Start Date" displayDatePicker="true" required="true" format="MM/DD/YYYY" value="{!v.startDate}"/>
+                <ui:inputDate aura:id="endDateField" label="Hours End Date" displayDatePicker="true" required="true" format="MM/DD/YYYY" value="{!v.endDate}"/>
+            </div>
+        </div>
+        <div class="slds-p-bottom_large slds-align_absolute-center">
+            <lightning:button label="Submit" onclick="{!c.submitHours}" variant="brand"/>
+        </div>
+
+        <div aura:id="tableDiv" class="slds-p-around_small">
+            <aura:if isTrue="{!v.studentSelectedError}">
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error">
+                    <span class="slds-assistive-text">error</span>
+                    <h2>No students are selected</h2>
+                </div>
+            </aura:if>
+
+            <table class="slds-table slds-table_bordered slds-table_resizable-cols slds-table_cell-buffer" role="grid">
+                <thead>
+                <tr class="slds-text-title_caps">
+                    <th scope="col" class="slds-text-align_right" style="width: 3.25rem;" title="Selected">
+                        <ui:inputCheckbox change="{!c.selectAll}" value="false" aura:id="selectAllCheckbox"/>
+                    </th>
+                    <th scope="col">
+                        <div>{!v.nameField}</div>
+                    </th>
+                    <th scope="col">
+                        <div>{!v.statusField}</div>
+                    </th>
+                    <th scope="col">
+                        <div>{!v.startDateField}</div>
+                    </th>
+                    <th scope="col">
+                        <div>{!v.endDateField}</div>
+                    </th>
+                    <th scope="col">
+                        <div>{!v.dropField}</div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.studentList}" var="student">
+                        <tr>
+                            <th scope="row" data-label="Selected" class="slds-text-align_right" style="width: 3.25rem;">
+                                <ui:inputCheckbox value="{!student.updateSelect}" change="{!c.studentSelected}"/>
+                            </th>
+                            <td data-label="{!v.nameField}">
+                                <div class="slds-truncate" title="{!student.hed__Contact__r.Name_W_Last_first__c}">{!student.hed__Contact__r.Name_W_Last_first__c}</div>
+                            </td>
+                            <td data-label="{!v.statusField}">
+                                <div class="slds-truncate" title="{!student.hed__Status__c}">{!student.hed__Status__c}</div>
+                            </td>
+                            <td data-label="{!v.startDateField}">
+                                <div class="slds-truncate" title="{!student.Start_Date__c}">{!student.Start_Date__c}</div>
+                            </td>
+                            <td data-label="{!v.endDateField}">
+                                <div class="slds-truncate" title="{!student.End_Date__c}">{!student.End_Date__c}</div>
+                            </td>
+                            <td data-label="{!v.dropField}">
+                                <div class="slds-truncate" title="{!student.Drop_Reason__c}">{!student.Drop_Reason__c}</div>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </div>
+    </lightning:card>
+
+
+</aura:component>
